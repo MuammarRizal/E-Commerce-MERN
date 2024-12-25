@@ -42,3 +42,24 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   createSendResToken(createUser, 201, res);
 });
+
+export const loginUser = asyncHandler(async (req, res) => {
+  // jika password dan email tidak di isi
+  if (!req.body.email || !req.body.password) {
+    res.status(400);
+    throw new Error("Input email atau password tidak boleh kosong");
+  }
+
+  // email tidak ada
+  const userData = await User.findOne({
+    email: req.body.email,
+  });
+
+  // check password
+  if (userData && (await userData.comparePassword(req.body.password))) {
+    createSendResToken(userData, 200, res);
+  } else {
+    res.status(400);
+    throw new Error("Invalid User");
+  }
+});
